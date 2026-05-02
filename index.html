@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Custom Language Translator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 12px;
+        width: 420px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    textarea {
+        width: 100%;
+        height: 100px;
+        border-radius: 8px;
+        border: none;
+        padding: 10px;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    select, button {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: none;
+        font-size: 14px;
+    }
+
+    button {
+        background: #38bdf8;
+        color: black;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: #0ea5e9;
+    }
+
+    .output {
+        background: #020617;
+        padding: 10px;
+        border-radius: 8px;
+        min-height: 60px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌌 Translator</h1>
+
+    <select id="mode">
+        <option value="1">English → Custom</option>
+        <option value="2">Custom → English</option>
+    </select>
+
+    <textarea id="inputText" placeholder="Enter text..."></textarea>
+
+    <button onclick="translate()">Translate</button>
+
+    <div class="output" id="outputText"></div>
+</div>
+
+<script>
+// --- letter map ---
+const engToCustom = {
+    'a':'ka','b':'ba','c':'ca','d':'du','e':'ee','f':'fa','g':'ga','h':'ha',
+    'i':'ai','j':'ko','k':'ki','l':'lo','m':'mo','n':'zo','o':'mi','p':'pi',
+    'q':'po','r':'ri','s':'sa','t':'gu','u':'lu','v':'vo','w':'wa','x':'xa',
+    'y':'ya','z':'la'
+};
+
+const customToEng = {};
+for (let k in engToCustom) {
+    if (k !== 'e') customToEng[engToCustom[k]] = k;
+}
+customToEng['ee'] = 'e';
+
+// --- shortcuts ---
+const special = {
+    "i":"ai","you":"yalo","he":"halo","she":"salo","it":"ito",
+    "we":"walo","they":"talo",
+    "me":"milo","my":"milo",
+    "your":"yaloa","our":"waloa","their":"taloa",
+    "the":"tho","a":"ko","an":"ko",
+    "and":"ano","but":"buto","or":"oro","because":"beco",
+    "are":"kariee","is":"karii","am":"karia"
+};
+
+const reverseSpecial = {};
+for (let k in special) reverseSpecial[special[k]] = k;
+
+
+// --- ENGLISH → CUSTOM ---
+function engToCust(text){
+    return text.split(" ").map(word=>{
+        let lower = word.toLowerCase();
+
+        if (special[lower]) return special[lower];
+
+        let result = "";
+        for (let i=0;i<lower.length;i++){
+            let ch = lower[i];
+            if (ch==="e"){
+                result+="ee";
+            } else {
+                result+= engToCustom[ch] || ch;
+            }
+        }
+        return result;
+    }).join(" ");
+}
+
+
+// --- CUSTOM → ENGLISH ---
+function custToEng(text){
+    let words = text.split(" ");
+    let result = [];
+
+    for (let word of words){
+        let lower = word.toLowerCase();
+
+        if (reverseSpecial[lower]){
+            result.push(reverseSpecial[lower]);
+            continue;
+        }
+
+        let temp="";
+        for (let i=0;i<lower.length;){
+            if (lower.slice(i,i+2) in customToEng){
+                temp+=customToEng[lower.slice(i,i+2)];
+                i+=2;
+            } else {
+                temp+=lower[i];
+                i++;
+            }
+        }
+
+        result.push(temp);
+    }
+
+    return result.join(" ");
+}
+
+
+// --- MAIN ---
+function translate(){
+    const mode = document.getElementById("mode").value;
+    const input = document.getElementById("inputText").value;
+
+    let output = "";
+
+    if (mode === "1"){
+        output = engToCust(input);
+    } else {
+        output = custToEng(input);
+    }
+
+    document.getElementById("outputText").innerText = output;
+}
+</script>
+
+</body>
+</html>
