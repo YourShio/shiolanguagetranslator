@@ -36,7 +36,7 @@
         padding: 10px;
         margin-bottom: 10px;
         font-size: 14px;
-        box-sizing: border-box; /* Fixes width issues */
+        box-sizing: border-box;
     }
 
     select, button {
@@ -80,17 +80,15 @@
 
     <textarea id="inputText" placeholder="Enter text..."></textarea>
 
-    <!-- Function name changed to startTranslation -->
     <button onclick="startTranslation()">Translate</button>
 
     <div class="output" id="outputText"></div>
 </div>
 
 <script>
-// --- letter map ---
 const engToCustom = {
     'a':'ka','b':'ba','c':'ca','d':'du','e':'ee','f':'fa','g':'ga','h':'ha',
-    'i':'ai','j':'ko','k':'ki','l':'lo','m':'mo','n':'zo','o':'mi','pi':'pi',
+    'i':'ai','j':'ko','k':'ki','l':'lo','m':'mo','n':'zo','o':'mi','p':'pi',
     'q':'po','r':'ri','s':'sa','t':'gu','u':'lu','v':'vo','w':'wa','x':'xa',
     'y':'ya','z':'la'
 };
@@ -101,12 +99,14 @@ for (let k in engToCustom) {
 }
 customToEng['ee'] = 'e';
 
-// --- shortcuts ---
+// UPDATED SPECIAL WORDS: "me" and "my" are now different
 const special = {
     "i":"ai","you":"yalo","he":"halo","she":"salo","it":"ito",
     "we":"walo","they":"talo",
-    "me":"milo","my":"milo",
-    "your":"yaloa","our":"waloa","their":"taloa",
+    "me":"milo",
+    "my":"mila",
+    "your":"yala",
+    "our":"waloa","their":"taloa",
     "the":"tho","a":"ko","an":"ko",
     "and":"ano","but":"buto","or":"oro","because":"beco",
     "are":"kariee","is":"karii","am":"karia"
@@ -115,41 +115,29 @@ const special = {
 const reverseSpecial = {};
 for (let k in special) reverseSpecial[special[k]] = k;
 
-
-// --- ENGLISH → CUSTOM ---
 function engToCust(text){
     return text.split(" ").map(word=>{
         let lower = word.toLowerCase();
-
         if (special[lower]) return special[lower];
-
         let result = "";
         for (let i=0;i<lower.length;i++){
             let ch = lower[i];
-            if (ch==="e"){
-                result+="ee";
-            } else {
-                result+= engToCustom[ch] || ch;
-            }
+            if (ch==="e") result+="ee";
+            else result+= engToCustom[ch] || ch;
         }
         return result;
     }).join(" ");
 }
 
-
-// --- CUSTOM → ENGLISH ---
 function custToEng(text){
     let words = text.split(" ");
     let result = [];
-
     for (let word of words){
         let lower = word.toLowerCase();
-
         if (reverseSpecial[lower]){
             result.push(reverseSpecial[lower]);
             continue;
         }
-
         let temp="";
         for (let i=0;i<lower.length;){
             if (lower.slice(i,i+2) in customToEng){
@@ -160,28 +148,15 @@ function custToEng(text){
                 i++;
             }
         }
-
         result.push(temp);
     }
-
     return result.join(" ");
 }
 
-
-// --- MAIN ---
-// Renamed to avoid browser 'translate' conflict
 function startTranslation(){
     const mode = document.getElementById("mode").value;
     const input = document.getElementById("inputText").value;
-
-    let output = "";
-
-    if (mode === "1"){
-        output = engToCust(input);
-    } else {
-        output = custToEng(input);
-    }
-
+    let output = (mode === "1") ? engToCust(input) : custToEng(input);
     document.getElementById("outputText").innerText = output;
 }
 </script>
