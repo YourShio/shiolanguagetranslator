@@ -11,7 +11,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        /* Changed to min-height for better mobile support */
+        min-height: 100vh;
+        margin: 0;
     }
 
     .container {
@@ -35,6 +37,7 @@
         padding: 10px;
         margin-bottom: 10px;
         font-size: 14px;
+        box-sizing: border-box; /* Ensures padding doesn't break width */
     }
 
     select, button {
@@ -62,6 +65,7 @@
         padding: 10px;
         border-radius: 8px;
         min-height: 60px;
+        word-wrap: break-word; /* Prevents long words from overflowing */
     }
 </style>
 </head>
@@ -77,7 +81,8 @@
 
     <textarea id="inputText" placeholder="Enter text..."></textarea>
 
-    <button onclick="translate()">Translate</button>
+    <!-- Renamed function call here -->
+    <button onclick="doTranslation()">Translate</button>
 
     <div class="output" id="outputText"></div>
 </div>
@@ -164,8 +169,9 @@ function custToEng(text){
 }
 
 
-// --- MAIN ---
-function translate(){
+// --- MAIN FUNCTION ---
+// Renamed to 'doTranslation' to avoid browser conflicts
+function doTranslation(){
     const mode = document.getElementById("mode").value;
     const input = document.getElementById("inputText").value;
 
